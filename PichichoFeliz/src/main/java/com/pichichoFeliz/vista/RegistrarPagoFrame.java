@@ -1,20 +1,21 @@
 package com.pichichoFeliz.vista;
 
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.pichichoFeliz.dao.PagoDAO;
@@ -92,18 +93,107 @@ public class RegistrarPagoFrame extends JFrame {
 		contentPane.add(textField_2);
 		
 		JButton btnNewButton = new JButton("Guardar");
+
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					int idCita = Integer.parseInt(textField.getText());
+					double monto = Double.parseDouble(textField_1.getText());
+					String metodo = textField_2.getText();
+
+					if (metodo.isBlank()) {
+						JOptionPane.showMessageDialog(null, "Debe ingresar el método de pago.");
+						return;
+					}
+
+					if (monto <= 0) {
+						JOptionPane.showMessageDialog(null, "El monto debe ser mayor a cero.");
+						return;
+					}
+
+					Pago pago = new Pago(idCita, monto, metodo);
+
+					PagoDAO pagoDAO = new PagoDAO();
+					pagoDAO.guardarPago(pago);
+
+					JOptionPane.showMessageDialog(null, "Pago registrado correctamente.");
+
+					cargarPagos();
+
+					textField.setText("");
+					textField_1.setText("");
+					textField_2.setText("");
+
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "ID Cita y Monto deben ser valores numéricos.");
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Error al registrar pago: " + ex.getMessage());
+				}
+			}
+		});
+
 		btnNewButton.setBounds(220, 79, 84, 20);
 		contentPane.add(btnNewButton);
 		
 		JButton btnBuscar = new JButton("Buscar");
+
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idCitaTexto = textField.getText();
+
+				if (idCitaTexto.isBlank()) {
+					cargarPagos();
+					return;
+				}
+
+				try {
+					int idCita = Integer.parseInt(idCitaTexto);
+
+					PagoDAO pagoDAO = new PagoDAO();
+					List<Object[]> pagos = pagoDAO.buscarPagosPorIdCita(idCita);
+
+					mostrarPagosEnTabla(pagos);
+
+					if (pagos.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "No se encontraron pagos para esa cita.");
+					}
+
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "El ID Cita debe ser numérico.");
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Error al buscar pago: " + ex.getMessage());
+				}
+			}
+		});
+
 		btnBuscar.setBounds(313, 79, 84, 20);
 		contentPane.add(btnBuscar);
 		
 		JButton btnLimpiar = new JButton("Limpiar");
+
+		btnLimpiar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textField.setText("");     // ID Cita
+				textField_1.setText("");   // Monto
+				textField_2.setText("");   // Método
+
+				cargarPagos();
+			}
+		});
+
 		btnLimpiar.setBounds(220, 104, 84, 20);
 		contentPane.add(btnLimpiar);
 		
 		JButton btnVolver = new JButton("Volver");
+
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MenuPrincipal menu = new MenuPrincipal();
+				menu.setVisible(true);
+				dispose();
+			}
+		});
+
 		btnVolver.setBounds(313, 104, 84, 20);
 		contentPane.add(btnVolver);
 		

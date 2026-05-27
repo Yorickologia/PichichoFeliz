@@ -86,6 +86,15 @@ public class MenuPrincipal extends JFrame {
 		contentPane.add(btnNewButton_1);
 		
 		btnRegistrarPago = new JButton("Registrar Pago");
+
+		btnRegistrarPago.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RegistrarPagoFrame ventanaPago = new RegistrarPagoFrame();
+				ventanaPago.setVisible(true);
+				dispose();
+			}
+		});
+
 		btnRegistrarPago.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRegistrarPago.setBounds(30, 182, 180, 30);
 		contentPane.add(btnRegistrarPago);
