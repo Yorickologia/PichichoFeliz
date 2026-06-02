@@ -103,6 +103,9 @@ public class MenuPrincipal extends JFrame {
 		btnReportes.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnReportes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				ReportesFrame reportesFrame = new ReportesFrame();
+				reportesFrame.setVisible(true);
+				dispose();
 			}
 		});
 		btnReportes.setBounds(30, 221, 180, 31);
