@@ -121,22 +121,145 @@ public class GestionInventarioFrame extends JFrame {
 		contentPane.add(btnGuardar);
 		
 		JButton btnBuscar = new JButton("Buscar");
+
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String nombreBuscado = textField.getText();
+
+				if (nombreBuscado.isBlank()) {
+					cargarProductos();
+					return;
+				}
+
+				try {
+					ProductoDAO productoDAO = new ProductoDAO();
+					List<Object[]> productos = productoDAO.buscarProductosPorNombre(nombreBuscado);
+
+					mostrarProductosEnTabla(productos);
+
+					if (productos.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "No se encontraron productos.");
+					}
+
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Error al buscar producto: " + ex.getMessage());
+				}
+			}
+		});
 		btnBuscar.setBounds(319, 50, 84, 20);
 		contentPane.add(btnBuscar);
 		
 		JButton btnEditar = new JButton("Editar");
+		btnEditar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				int filaSeleccionada = table.getSelectedRow();
+
+				if (filaSeleccionada < 0) {
+					JOptionPane.showMessageDialog(null, "Debe seleccionar un producto de la tabla.");
+					return;
+				}
+
+				try {
+					int idProducto = Integer.parseInt(table.getValueAt(filaSeleccionada, 0).toString());
+					String nombre = textField.getText();
+					int cantidad = Integer.parseInt(textField_1.getText());
+
+					if (nombre.isBlank()) {
+						JOptionPane.showMessageDialog(null, "Debe ingresar el nombre del producto.");
+						return;
+					}
+
+					if (cantidad < 0) {
+						JOptionPane.showMessageDialog(null, "La cantidad no puede ser negativa.");
+						return;
+					}
+
+					ProductoDAO productoDAO = new ProductoDAO();
+					productoDAO.editarProducto(idProducto, nombre, cantidad);
+
+					JOptionPane.showMessageDialog(null, "Producto editado correctamente.");
+
+					cargarProductos();
+
+					textField.setText("");
+					textField_1.setText("");
+
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "La cantidad debe ser numérica.");
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Error al editar producto: " + ex.getMessage());
+				}
+			}
+		});
 		btnEditar.setBounds(225, 74, 84, 20);
 		contentPane.add(btnEditar);
 		
 		JButton btnEliminar = new JButton("Eliminar");
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				int filaSeleccionada = table.getSelectedRow();
+
+				if (filaSeleccionada < 0) {
+					JOptionPane.showMessageDialog(null, "Debe seleccionar un producto de la tabla.");
+					return;
+				}
+
+				int confirmacion = JOptionPane.showConfirmDialog(
+					null,
+					"¿Está seguro que desea eliminar este producto?",
+					"Confirmar eliminación",
+					JOptionPane.YES_NO_OPTION
+				);
+
+				if (confirmacion != JOptionPane.YES_OPTION) {
+					return;
+				}
+
+				try {
+					int idProducto = Integer.parseInt(table.getValueAt(filaSeleccionada, 0).toString());
+
+					ProductoDAO productoDAO = new ProductoDAO();
+					productoDAO.eliminarProducto(idProducto);
+
+					JOptionPane.showMessageDialog(null, "Producto eliminado correctamente.");
+
+					cargarProductos();
+
+					textField.setText("");
+					textField_1.setText("");
+
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(null, "Error al obtener el ID del producto.");
+				} catch (SQLException ex) {
+					JOptionPane.showMessageDialog(null, "Error al eliminar producto: " + ex.getMessage());
+				}
+			}
+		});
 		btnEliminar.setBounds(319, 74, 84, 20);
 		contentPane.add(btnEliminar);
 		
 		JButton btnLimpiar = new JButton("Limpiar");
+		btnLimpiar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textField.setText("");     // Producto
+				textField_1.setText("");   // Cantidad
+
+				cargarProductos();
+			}
+		});
 		btnLimpiar.setBounds(225, 99, 84, 20);
 		contentPane.add(btnLimpiar);
 		
 		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MenuPrincipal menu = new MenuPrincipal();
+				menu.setVisible(true);
+				dispose();
+			}
+		});
 		btnVolver.setBounds(319, 99, 84, 20);
 		contentPane.add(btnVolver);
 		

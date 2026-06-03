@@ -112,6 +112,13 @@ public class MenuPrincipal extends JFrame {
 		contentPane.add(btnReportes);
 		
 		btnInventario = new JButton("Inventario");
+		btnInventario.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GestionInventarioFrame inventarioFrame = new GestionInventarioFrame();
+				inventarioFrame.setVisible(true);
+				dispose();
+			}
+		});
 		btnInventario.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnInventario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
